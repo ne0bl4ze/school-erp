@@ -1,0 +1,42 @@
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  flex-shrink: 0; overflow-y: auto;
+}
+
+.userCard {
+  padding: 16px; border-bottom: 1px solid var(--border);
+  display: flex; gap: 10px; align-items: flex-start;
+}
+
+.ucAvatar {
+  width: 46px; height: 46px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--secondary) 0%, #7A3800 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800; color: #000; flex-shrink: 0;
+}
+
+.ucInfo { flex: 1; min-width: 0; }
+.ucName { font-size: 11px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.4px; line-height: 1.4; }
+.ucMeta { margin-top: 5px; display: flex; flex-direction: column; gap: 2px; }
+.ucMeta span { font-size: 10.5px; color: var(--text-muted); }
+.ucRoll { color: var(--secondary) !important; font-weight: 600 !important; }
+
+.navGroup { padding: 6px 0; flex: 1; }
+
+.navItem {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 16px; cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background 0.12s, border-color 0.12s;
+  text-decoration: none;
+}
+.navItem:hover { background: var(--surface-2); }
+.navItem.active { background: var(--secondary-dim); border-left-color: var(--secondary); }
+.navItem.active .navLabel { color: var(--secondary); font-weight: 600; }
+.navItem.active .navIcon { color: var(--secondary); }
+
+.navIcon { width: 15px; color: var(--text-muted); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.navLabel { font-size: 12.5px; font-weight: 500; color: var(--text-secondary); }
