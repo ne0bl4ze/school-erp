@@ -4,7 +4,7 @@ const announcementSchema = new mongoose.Schema({
   title:      { type: String, required: true },
   body:       { type: String, required: true },
   author:     { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  targetRole: { type: String, enum: ['all', 'student', 'teacher'], default: 'all' },
+  targetRole: { type: String, enum: ['all', 'student', 'teacher', 'parent', 'principal'], default: 'all' },
   grade:      { type: Number },
   attachments:[{ name: String, url: String }],
   comments: [{

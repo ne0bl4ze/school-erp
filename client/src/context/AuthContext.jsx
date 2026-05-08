@@ -4,7 +4,7 @@ import api from '../services/api';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser]       = useState(null);
+  const [user,    setUser]    = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -31,8 +31,11 @@ export function AuthProvider({ children }) {
     setProfile(null);
   };
 
+  // Helper: first child for parent, or null
+  const activeChild = profile?.children?.[0] || null;
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, profile, loading, login, logout, activeChild }}>
       {children}
     </AuthContext.Provider>
   );

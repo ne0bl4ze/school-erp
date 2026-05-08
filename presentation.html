@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School ERP — Project Presentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #DF740C;
+    --orange-dim: rgba(223,116,12,0.15);
+    --black: #000000;
+    --surface: #111111;
+    --surface2: #1A1A1A;
+    --border: #2C2C2C;
+    --text: #FFFFFF;
+    --muted: #888888;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; }
+
+  /* ── SLIDE ENGINE ── */
+  .deck { width: 100%; height: 100vh; position: relative; }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none;
+    transform: translateY(24px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+  .slide.active { opacity: 1; pointer-events: all; transform: none; }
+
+  /* ── NAV ── */
+  .nav {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 14px; z-index: 99;
+    background: rgba(17,17,17,0.9); border: 1px solid var(--border);
+    border-radius: 999px; padding: 10px 20px;
+    backdrop-filter: blur(10px);
+  }
+  .nav button {
+    background: transparent; border: none; color: var(--muted);
+    font-size: 18px; cursor: pointer; padding: 2px 6px;
+    transition: color 0.15s;
+  }
+  .nav button:hover { color: var(--orange); }
+  .nav .counter { font-size: 12px; font-weight: 600; color: var(--muted); min-width: 50px; text-align: center; }
+  .dots { display: flex; gap: 5px; }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--border); cursor: pointer; transition: background 0.2s, transform 0.2s;
+  }
+  .dot.active { background: var(--orange); transform: scale(1.4); }
+
+  /* ── SHARED LAYOUT ── */
+  .slide-header {
+    padding: 32px 56px 0;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .slide-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--orange);
+    padding: 4px 10px; border: 1px solid rgba(223,116,12,0.4);
+    border-radius: 999px;
+  }
+  .slide-num { font-size: 11px; color: var(--muted); font-weight: 600; }
+  .slide-body { flex: 1; padding: 28px 56px 80px; overflow: hidden; }
+
+  h1 { font-size: clamp(28px, 4vw, 52px); font-weight: 900; line-height: 1.1; }
+  h2 { font-size: clamp(22px, 3vw, 36px); font-weight: 800; line-height: 1.2; }
+  h3 { font-size: 16px; font-weight: 700; }
+  .accent { color: var(--orange); }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; height: 100%; }
+  .grid3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 22px;
+  }
+  .card-accent { border-color: var(--orange); }
+
+  code, pre {
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .code-block {
+    background: #0A0A0A; border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px; font-size: 12px;
+    line-height: 1.7; color: #E0E0E0; overflow: hidden;
+  }
+  .code-block .kw  { color: #C792EA; }
+  .code-block .fn  { color: #82AAFF; }
+  .code-block .str { color: #C3E88D; }
+  .code-block .cmt { color: #546E7A; }
+  .code-block .num { color: #F78C6C; }
+  .code-block .obj { color: var(--orange); }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 999px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  }
+  .pill-orange { background: var(--orange-dim); color: var(--orange); border: 1px solid rgba(223,116,12,0.3); }
+  .pill-green  { background: rgba(34,197,94,0.12); color: #22C55E; }
+  .pill-blue   { background: rgba(59,130,246,0.12); color: #60A5FA; }
+  .pill-purple { background: rgba(167,139,250,0.12); color: #A78BFA; }
+
+  ul.feat { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  ul.feat li { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; color: #C0C0C0; line-height: 1.5; }
+  ul.feat li::before { content: '▸'; color: var(--orange); flex-shrink: 0; margin-top: 1px; }
+
+  .arch-box {
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 18px; text-align: center;
+    font-size: 12px; font-weight: 600;
+  }
+  .arch-arrow { text-align: center; color: var(--orange); font-size: 20px; line-height: 1; }
+
+  .person-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px; text-align: center;
+  }
+  .avatar-lg {
+    width: 56px; height: 56px; border-radius: 14px;
+    background: linear-gradient(135deg, var(--orange), #7A3800);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800; color: #000;
+    margin: 0 auto 12px;
+  }
+
+  .stat-big { font-size: 40px; font-weight: 900; color: var(--orange); line-height: 1; }
+  .stat-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-top: 4px; }
+
+  .flow-step {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px;
+    font-size: 13px; color: #C0C0C0;
+  }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--orange-dim); border: 1px solid rgba(223,116,12,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; color: var(--orange); flex-shrink: 0;
+  }
+
+  /* ── SLIDE-SPECIFIC ── */
+  #s1 {
+    background: radial-gradient(ellipse 80% 60% at 70% 50%, rgba(223,116,12,0.08) 0%, transparent 70%), #000;
+    justify-content: center; align-items: flex-start; padding: 0 10vw;
+  }
+  #s1 .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); margin-bottom: 20px; }
+  #s1 h1 { font-size: clamp(36px,5.5vw,72px); margin-bottom: 18px; }
+  #s1 .sub { font-size: 16px; color: var(--muted); max-width: 480px; line-height: 1.7; margin-bottom: 32px; }
+  #s1 .pills { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* ── PROGRESS BAR ── */
+  .progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--orange); transition: width 0.4s ease; z-index: 100; }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+  .slide.active .card, .slide.active .flow-step, .slide.active .person-card {
+    animation: fadeIn 0.5s ease both;
+  }
+  .slide.active .card:nth-child(2)  { animation-delay: 0.07s; }
+  .slide.active .card:nth-child(3)  { animation-delay: 0.14s; }
+  .slide.active .card:nth-child(4)  { animation-delay: 0.21s; }
+  .slide.active .card:nth-child(5)  { animation-delay: 0.28s; }
+  .slide.active .flow-step:nth-child(2) { animation-delay: 0.08s; }
+  .slide.active .flow-step:nth-child(3) { animation-delay: 0.16s; }
+  .slide.active .flow-step:nth-child(4) { animation-delay: 0.24s; }
+  .slide.active .flow-step:nth-child(5) { animation-delay: 0.32s; }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+  <!-- ═══ SLIDE 1 — TITLE ═══ -->
+  <div class="slide active" id="s1">
+    <div style="padding: 0 10vw; display:flex; flex-direction:column; justify-content:center; height:100%;">
+      <div class="eyebrow">Team Project Presentation</div>
+      <h1>School <span class="accent">ERP</span><br>Management System</h1>
+      <p class="sub">A full-stack web application for managing school operations — attendance, grades, fees, timetables, and more.</p>
+      <div class="pills">
+        <span class="pill pill-orange">MongoDB</span>
+        <span class="pill pill-blue">Express.js</span>
+        <span class="pill pill-green">React JS</span>
+        <span class="pill pill-orange">Node.js</span>
+        <span class="pill pill-purple">PDFKit · Nodemailer</span>
+      </div>
+    </div>
+    <div style="position:absolute;right:8vw;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:12px;align-items:center;">
+      <div style="width:80px;height:80px;background:var(--orange);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900;color:#000;font-style:italic;">E</div>
+      <div style="font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;">ERP Portal</div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 2 — TEAM ═══ -->
+  <div class="slide" id="s2">
+    <div class="slide-header">
+      <span class="slide-tag">The Team</span>
+      <span class="slide-num">02 / 14</span>
+    </div>
+    <div class="slide-body">
+      <h2 style="margin-bottom:6px;">Meet the <span class="accent">Team</span></h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:24px;">Five members — each owning a distinct layer of the system</p>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;">
+        <div class="person-card">
+          <div class="avatar-lg">A</div>
+          <h3 style="font-size:14px;margin-bottom:4px;">Member 1</h3>
+          <div style="font-size:11px;color:var(--orange);font-weight:600;margin-bottom:10px;">Project Lead</div>
+          <ul class="feat" style="text-align:left;">
+            <li>Project architecture</li>
+            <li>System design</li>
+            <li>Integration</li>
+          </ul>
+        </div>
+        <div class="person-card">
+          <div class="avatar-lg">B</div>
+          <h3 style="font-size:14px;margin-bottom:4px;">Member 2</h3>
+          <div style="font-size:11px;color:var(--orange);font-weight:600;margin-bottom:10px;">Frontend Dev</div>
+          <ul class="feat" style="text-align:left;">
+            <li>React components</li>
+            <li>UI/UX design</li>
+            <li>Routing & auth</li>
+          </ul>
+        </div>
+        <div class="person-card">
+          <div class="avatar-lg">C</div>
+          <h3 style="font-size:14px;margin-bottom:4px;">Member 3</h3>
+          <div style="font-size:11px;color:var(--orange);font-weight:600;margin-bottom:10px;">Backend Dev</div>
+          <ul class="feat" style="text-align:left;">
+            <li>Express.js APIs</li>
+            <li>RBAC middleware</li>
+            <li>Route handling</li>
+          </ul>
+        </div>
+        <div class="person-card">
+          <div class="avatar-lg">D</div>
+          <h3 style="font-size:14px;margin-bottom:4px;">Member 4</h3>
+          <div style="font-size:11px;color:var(--orange);font-weight:600;margin-bottom:10px;">Database Engineer</div>
+          <ul class="feat" style="text-align:left;">
+            <li>MongoDB schemas</li>
+            <li>Data modelling</li>
+            <li>Query design</li>
+          </ul>
+        </div>
+        <div class="person-card">
+          <div class="avatar-lg">E</div>
+          <h3 style="font-size:14px;margin-bottom:4px;">Member 5</h3>
+          <div style="font-size:11px;color:var(--orange);font-weight:600;margin-bottom:10px;">Features & DevOps</div>
+          <ul class="feat" style="text-align:left;">
+            <li>PDF generation</li>
+            <li>Email alerts</li>
+            <li>Deployment</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 3 — PROBLEM STATEMENT ═══ -->
+  <div class="slide" id="s3">
+    <div class="slide-header">
+      <span class="slide-tag">Problem Statement</span>
+      <span class="slide-num">03 / 14</span>
+    </div>
+    <div class="slide-body">
+      <div class="grid2" style="align-items:start;gap:32px;">
+        <div>
+          <h2 style="margin-bottom:16px;">Why does a school need an <span class="accent">ERP?</span></h2>
+          <p style="color:var(--muted);font-size:14px;line-height:1.8;margin-bottom:24px;">Traditional schools manage attendance registers, grade sheets, fee receipts, and timetables manually — leading to errors, delays, and no real-time visibility for parents or students.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="flow-step"><div class="step-num">✗</div>Paper attendance registers — error-prone and hard to audit</div>
+            <div class="flow-step"><div class="step-num">✗</div>Fee tracking via spreadsheets — no payment history</div>
+            <div class="flow-step"><div class="step-num">✗</div>Report cards printed manually — time consuming</div>
+            <div class="flow-step"><div class="step-num">✗</div>Parents have no real-time updates on their child</div>
+            <div class="flow-step"><div class="step-num">✗</div>No centralised platform for notices and announcements</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <h3 style="color:var(--orange);margin-bottom:4px;">Our Solution</h3>
+          <div class="card card-accent">
+            <div style="font-size:12px;font-weight:700;color:var(--orange);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Centralised Web Platform</div>
+            <p style="font-size:13px;color:#C0C0C0;line-height:1.7;">One login for students, teachers, and admins — each seeing only what their role permits.</p>
+          </div>
+          <div class="card">
+            <div style="font-size:12px;font-weight:700;color:var(--orange);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Real-time Data</div>
+            <p style="font-size:13px;color:#C0C0C0;line-height:1.7;">Attendance marked instantly, grades entered and visible immediately, fees tracked with full transaction history.</p>
+          </div>
+          <div class="card">
+            <div style="font-size:12px;font-weight:700;color:var(--orange);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Automated Alerts</div>
+            <p style="font-size:13px;color:#C0C0C0;line-height:1.7;">Parents get email alerts for low attendance, fee confirmation, and leave approvals — via Nodemailer.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 4 — TECH STACK ═══ -->
+  <div class="slide" id="s4">
+    <div class="slide-header">
+      <span class="slide-tag">Tools & Technologies</span>
+      <span class="slide-num">04 / 14</span>
+    </div>
+    <div class="slide-body">
+      <h2 style="margin-bottom:20px;">The <span class="accent">MERN</span> Stack</h2>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;">
+        <div class="card" style="text-align:center;">
+          <div style="font-size:28px;margin-bottom:10px;">🍃</div>
+          <div style="font-weight:800;font-size:15px;color:var(--orange);margin-bottom:6px;">MongoDB</div>
+          <p style="font-size:12px;color:var(--muted);line-height:1.6;">Student records, timetables, attendance logs, fee transactions, grade documents</p>
+        </div>
+        <div class="card" style="text-align:center;">
+          <div style="font-size:28px;margin-bottom:10px;">⚡</div>
+          <div style="font-weight:800;font-size:15px;color:var(--orange);margin-bottom:6px;">Express.js</div>
+          <p style="font-size:12px;color:var(--muted);line-height:1.6;">Multi-role REST APIs for all ERP modules with strict RBAC middleware</p>
+        </div>
+        <div class="card" style="text-align:center;">
+          <div style="font-size:28px;margin-bottom:10px;">⚛️</div>
+          <div style="font-weight:800;font-size:15px;color:var(--orange);margin-bottom:6px;">React JS</div>
+          <p style="font-size:12px;color:var(--muted);line-height:1.6;">Role-specific dashboards including attendance marking and grade entry forms</p>
+        </div>
+        <div class="card" style="text-align:center;">
+          <div style="font-size:28px;margin-bottom:10px;">🟢</div>
+          <div style="font-weight:800;font-size:15px;color:var(--orange);margin-bottom:6px;">Node.js</div>
+          <p style="font-size:12px;color:var(--muted);line-height:1.6;">PDFKit for report card generation and Nodemailer for parent alerts</p>
+        </div>
+        <div class="card" style="text-align:center;">
+          <div style="font-size:28px;margin-bottom:10px;">🔧</div>
+          <div style="font-weight:800;font-size:15px;color:var(--orange);margin-bottom:6px;">Dev Tools</div>
+          <p style="font-size:12px;color:var(--muted);line-height:1.6;">Vite, React Router, Axios, JWT, bcryptjs, Mongoose, Nodemon</p>
+        </div>
+      </div>
+      <div class="card" style="background:#0A0A0A;">
+        <div style="display:flex;gap:32px;align-items:center;justify-content:center;">
+          <div style="text-align:center;"><div class="stat-big">10</div><div class="stat-lbl">DB Models</div></div>
+          <div style="width:1px;height:50px;background:var(--border);"></div>
+          <div style="text-align:center;"><div class="stat-big">8</div><div class="stat-lbl">API Routes</div></div>
+          <div style="width:1px;height:50px;background:var(--border);"></div>
+          <div style="text-align:center;"><div class="stat-big">13</div><div class="stat-lbl">React Pages</div></div>
+          <div style="width:1px;height:50px;background:var(--border);"></div>
+          <div style="text-align:center;"><div class="stat-big">3</div><div class="stat-lbl">User Roles</div></div>
+          <div style="width:1px;height:50px;background:var(--border);"></div>
+          <div style="text-align:center;"><div class="stat-big">3</div><div class="stat-lbl">PDF Types</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 5 — ARCHITECTURE ═══ -->
+  <div class="slide" id="s5">
+    <div class="slide-header">
+      <span class="slide-tag">System Architecture</span>
+      <span class="slide-num">05 / 14</span>
+    </div>
+    <div class="slide-body">
+      <h2 style="margin-bottom:20px;">How It All <span class="accent">Connects</span></h2>
+      <div style="display:grid;grid-template-columns:1fr 60px 1fr 60px 1fr;align-items:center;gap:0;margin-bottom:20px;">
+        <div class="card" style="text-align:center;padding:20px;">
+          <div style="font-size:22px;margin-bottom:8px;">⚛️</div>
+          <div style="font-weight:800;color:var(--orange);margin-bottom:6px;">React Frontend</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8;">Vite + React Router<br>Axios HTTP Client<br>Context API (Auth)<br>CSS Modules</div>
+        </div>
+        <div style="text-align:center;color:var(--orange);font-size:24px;">→</div>
+        <div class="card" style="text-align:center;padding:20px;border-color:var(--orange);">
+          <div style="font-size:22px;margin-bottom:8px;">⚡</div>
+          <div style="font-weight:800;color:var(--orange);margin-bottom:6px;">Express Backend</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8;">JWT Auth Middleware<br>RBAC Role Guard<br>REST API Routes<br>PDFKit · Nodemailer</div>
+        </div>
+        <div style="text-align:center;color:var(--orange);font-size:24px;">→</div>
+        <div class="card" style="text-align:center;padding:20px;">
+          <div style="font-size:22px;margin-bottom:8px;">🍃</div>
+          <div style="font-weight:800;color:var(--orange);margin-bottom:6px;">MongoDB Atlas</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8;">Mongoose ODM<br>10 Schemas<br>Indexes & Relations<br>Aggregation</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+        <div class="card" style="background:#0A0A0A;">
+          <div style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Auth Flow</div>
+          <ul class="feat">
+            <li>User submits email + password</li>
+            <li>bcrypt verifies against hash in DB</li>
+            <li>JWT signed & returned to client</li>
+            <li>Token stored in localStorage</li>
+            <li>Sent as Bearer on every request</li>
+          </ul>
+        </div>
+        <div class="card" style="background:#0A0A0A;">
+          <div style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">RBAC Flow</div>
+          <ul class="feat">
+            <li>JWT decoded → user role extracted</li>
+            <li>allow() middleware checks role</li>
+            <li>Student → read own data only</li>
+            <li>Teacher → mark attendance, grades</li>
+            <li>Admin → full CRUD access</li>
+          </ul>
+        </div>
+        <div class="card" style="background:#0A0A0A;">
+          <div style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Data Flow</div>
+          <ul class="feat">
+            <li>React page calls api.js (Axios)</li>
+            <li>Express route handles request</li>
+            <li>Controller queries Mongoose</li>
+            <li>Mongoose runs MongoDB query</li>
+            <li>JSON response back to React</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 6 — FRONTEND OVERVIEW ═══ -->
+  <div class="slide" id="s6">
+    <div class="slide-header">
+      <span class="slide-tag">Frontend</span>
+      <span class="slide-num">06 / 14</span>
+    </div>
+    <div class="slide-body">
+      <h2 style="margin-bottom:6px;">React <span class="accent">Frontend</span></h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:20px;">Built with Vite + React 18, React Router v6, Axios, CSS Modules</p>
+      <div class="grid2">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="card">
+            <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Component Structure</div>
+            <div class="code-block" style="font-size:11px;">
+<span class="obj">client/src/</span><br>
+├── <span class="fn">App.jsx</span>        <span class="cmt">← Router + protected routes</span><br>
+├── <span class="fn">context/</span><br>
+│   └── <span class="fn">AuthContext.jsx</span> <span class="cmt">← global auth state</span><br>
+├── <span class="fn">services/</span><br>
+│   └── <span class="fn">api.js</span>     <span class="cmt">← Axios instance + interceptors</span><br>
+├── <span class="fn">components/Layout/</span><br>
+│   ├── <span class="fn">Header.jsx</span>  <span class="cmt">← top bar, logout</span><br>
+│   ├── <span class="fn">Sidebar.jsx</span> <span class="cmt">← nav with active state</span><br>
+│   └── <span class="fn">SubNav.jsx</span><br>
+└── <span class="fn">pages/</span>         <span class="cmt">← 13 route pages</span>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Protected Routing</div>
+            <div class="code-block" style="font-size:11px;">
+<span class="kw">function</span> <span class="fn">PrivateRoute</span>({ children }) {<br>
+&nbsp;&nbsp;<span class="kw">const</span> { user, loading } = <span class="fn">useAuth</span>();<br>
+&nbsp;&nbsp;<span class="kw">if</span> (loading) <span class="kw">return</span> &lt;<span class="fn">Spinner</span> /&gt;;<br>
+&nbsp;&nbsp;<span class="kw">return</span> user<br>
+&nbsp;&nbsp;&nbsp;&nbsp;? children<br>
+&nbsp;&nbsp;&nbsp;&nbsp;: &lt;<span class="fn">Navigate</span> to=<span class="str">"/login"</span> replace /&gt;;<br>
+}
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="card">
+            <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">13 Pages</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+              {['Dashboard','Profile','Attendance','Report Card','Timetable','Syllabus','Fees','Leave','Library','Hostel','Class Teacher','Announcements','School Blog'].map(p => (
+                `<div style="background:#0A0A0A;border:1px solid #2C2C2C;border-radius:6px;padding:6px 10px;font-size:11px;color:#A0A0A0;">${p}</div>`
+              )).join('')}
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Axios Interceptors</div>
+            <div class="code-block" style="font-size:11px;">
+<span class="cmt">// Attach JWT to every request</span><br>
+api.<span class="fn">interceptors</span>.request.<span class="fn">use</span>(cfg => {<br>
+&nbsp;&nbsp;<span class="kw">const</span> token = localStorage.<span class="fn">getItem</span>(<span class="str">'erp_token'</span>);<br>
+&nbsp;&nbsp;<span class="kw">if</span> (token)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cfg.headers.Authorization = <span class="str">`Bearer <span class="obj">${token}</span>`</span>;<br>
+&nbsp;&nbsp;<span class="kw">return</span> cfg;<br>
+});
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 7 — KEY FRONTEND PAGES ═══ -->
+  <div class="slide" id="s7">
+    <div class="slide-header">
+      <span class="slide-tag">Frontend — Key Pages</span>
+      <span class="slide-num">07 / 14</span>
+    </div>
+    <div class="slide-body">
+      <h2 style="margin-bottom:20px;">Role-Specific <span class="accent">Dashboards</span></h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+        <div class="card">
+          <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">📊 Dashboard</div>
+          <ul class="feat" style="margin-bottom:12px;">
+            <li>5 live stat cards (notices, attendance, subjects, grade, section)</li>
+            <li>Today's periods from timetable API</li>
+            <li>Notice board with inline comments</li>
+          </ul>
+          <div class="code-block" style="font-size:10px;">
+<span class="fn">useEffect</span>(() => {<br>
+&nbsp;&nbsp;api.<span class="fn">get</span>(<span class="str">'/timetable/my'</span>).<span class="fn">then</span>(...);<br>
+&nbsp;&nbsp;api.<span class="fn">get</span>(<span class="str">'/announcements'</span>).<span class="fn">then</span>(...);<br>
+&nbsp;&nbsp;api.<span class="fn">get</span>(<span class="str">'/attendance/my'</span>).<span class="fn">then</span>(...);<br>
+}, []);
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">✅ Attendance</div>
+          <ul class="feat" style="margin-bottom:12px;">
+            <li>Student view: per-subject % with progress bar</li>
+            <li>Teacher view: mark present/absent/late per student</li>
+            <li>Colour-coded: green ≥75%, orange ≥60%, red below</li>
+          </ul>
+          <div class="code-block" style="font-size:10px;">
+<span class="cmt">// Role-conditional render</span><br>
+<span class="kw">if</span> (user.role === <span class="str">'student'</span>)<br>
+&nbsp;&nbsp;<span class="kw">return</span> &lt;<span class="fn">StudentView</span> /&gt;;<br>
+<span class="kw">return</span> &lt;<span class="fn">TeacherView</span> /&gt;;
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">📋 Report Card</div>
+          <ul class="feat" style="margin-bottom:12px;">
+            <li>Term 1, Term 2, Final Exam, Practical columns</li>
+            <li>Auto-calculated average % and letter grade</li>
+            <li>One-click PDF download via PDFKit</li>
+          </ul>
+          <div class="code-block" style="font-size:10px;">
+<span class="kw">const</span> <span class="fn">downloadPDF</span> = (year) =><br>
+&nbsp;&nbsp;window.<span class="fn">open</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">`/api/pdf/report-card/<span class="obj">${year}</span>`</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">'_blank'</span><br>
+&nbsp;&nbsp;);
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:14px;">
+        <div class="card">
+          <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">💰 Fees</div>
+          <ul class="feat">
+            <li>Term-wise breakdown (tuition, hostel, exam)</li>
+            <li>Payment status badges: paid / partial / unpaid</li>
+            <li>Full transaction history + PDF receipt</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">📅 Leave</div>
+          <ul class="feat">
+            <li>Student submits leave with date range & reason</li>
+            <li>Status: pending → approved / rejected</li>
+            <li>Parent notified by email on decision</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🕐 Timetable</div>
+          <ul class="feat">
+            <li>5-column day grid (Mon–Fri)</li>
+            <li>Subject, room, time per period</li>
+            <li>Print-ready PDF export</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 8 — BACKEND OVERVIEW ═══ -->
+  <div class="slide" id="s8">
+    <div class="slide-header">
+      <span class="slide-tag">Backend</span>
+      <span class="slide-num">08 / 14</span>
+    </div>
+    <div class="slide-body">
+      <h2 style="margin-bottom:6px;">Express.js <span class="accent">Backend</span></h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:20px;">RESTful API with JWT authentication and role-based access control</p>
+      <div class="grid2">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="card">
+            <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">API Routes</div>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;">
+              {[
+                ['/api/auth','POST login, register, GET me'],
+                ['/api/students','CRUD student profiles'],
+                ['/api/timetable','GET class timetable'],
+                ['/api/attendance','Mark + view attendance'],
+                ['/api/grades','Enter + view grades'],
+                ['/api/fees','Fee records + payments'],
+                ['/api/leave','Apply + review leave'],
+                ['/api/pdf','Report card, receipt, timetable'],
+              ].map(([r,d]) => `
+                <div style="display:flex;gap:10px;align-items:baseline;">
+                  <code style="color:var(--orange);font-size:11px;flex-shrink:0;">${r}</code>
+                  <span style="color:var(--muted);">— ${d}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="card">
+            <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">JWT Auth Middleware</div>
+            <div class="code-block" style="font-size:11px;">
+<span class="kw">const</span> <span class="fn">protect</span> = <span class="kw">async</span> (req, res, next) => {<br>
+&nbsp;&nbsp;<span class="kw">const</span> token = req.headers<br>
+&nbsp;&nbsp;&nbsp;&nbsp;.authorization?.split(<span class="str">' '</span>)[<span class="num">1</span>];<br>
+&nbsp;&nbsp;<span class="kw">const</span> decoded = jwt.<span class="fn">verify</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;token, process.env.<span class="obj">JWT_SECRET</span><br>
+&nbsp;&nbsp;);<br>
+&nbsp;&nbsp;req.user = <span class="kw">await</span> User.<span class="fn">findById</span>(decoded.id);<br>
+&nbsp;&nbsp;<span class="fn">next</span>();<br>
+};
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">RBAC Middleware</div>
+            <div class="code-block" style="font-size:11px;">
+<span class="kw">const</span> <span class="fn">allow</span> = (...roles) => (req, res, next) => {<br>
+&nbsp;&nbsp;<span class="kw">if</span> (!roles.<span class="fn">includes</span>(req.user.role))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> res.<span class="fn">status</span>(<span class="num">403</span>).<span class="fn">json</span>({<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;message: <span class="str">`Access denied`</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;});<br>
+&nbsp;&nbsp;<span class="fn">next</span>();<br>
+};<br><br>
+<span class="cmt">// Usage in routes:</span><br>
+router.<span class="fn">post</span>(<span class="str">'/mark'</span>, protect,<br>
+&nbsp;&nbsp;<span class="fn">allow</span>(<span class="str">'teacher'</span>, <span class="str">'admin'</span>), ctrl);
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 9 — DATABASE ═══ -->
+  <div class="slide" id="s9">
+    <div class="slide-header">
+      <span class="slide-tag">Database</span>
+      <span class="slide-num">09 / 14</span>
+    </div>
+    <div class="slide-body">
+      <h2 style="margin-bottom:6px;">MongoDB <span class="accent">Schema Design</span></h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:18px;">10 Mongoose models with relationships, indexes, and pre-save hooks</p>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px;">
+        {['User','Student','Course','Timetable','Attendance','Fee','Grade','Announcement','Leave','Library'].map(m => `
+          <div class="arch-box"><span style="color:var(--orange);font-weight:700;">${m}</span></div>
+        `).join('')}
+      </div>
+      <div class="grid2" style="gap:14px;">
+        <div class="card">
+          <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Grade Schema (with pre-save hook)</div>
+          <div class="code-block" style="font-size:10.5px;">
+<span class="kw">const</span> gradeSchema = <span class="kw">new</span> Schema({<br>
+&nbsp;&nbsp;student: { type: ObjectId, ref: <span class="str">'Student'</span> },<br>
+&nbsp;&nbsp;course:  { type: ObjectId, ref: <span class="str">'Course'</span>  },<br>
+&nbsp;&nbsp;term1:    Number, term2: Number,<br>
+&nbsp;&nbsp;finalExam: Number, practical: Number,<br>
+&nbsp;&nbsp;percentage: Number, grade: String<br>
+});<br><br>
+<span class="cmt">// Auto-compute grade on save</span><br>
+gradeSchema.<span class="fn">pre</span>(<span class="str">'save'</span>, <span class="kw">function</span>(next) {<br>
+&nbsp;&nbsp;<span class="kw">this</span>.percentage = <span class="fn">avg</span>([term1,term2,final]);<br>
+&nbsp;&nbsp;<span class="kw">this</span>.grade = pct >= <span class="num">90</span> ? <span class="str">'A+'</span> : ...;<br>
+&nbsp;&nbsp;<span class="fn">next</span>();<br>
+});
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Attendance with Bulk Write</div>
+          <div class="code-block" style="font-size:10.5px;">
+<span class="cmt">// Upsert attendance for whole class</span><br>
+<span class="kw">const</span> ops = records.<span class="fn">map</span>(({ studentId, status }) => ({<br>
+&nbsp;&nbsp;updateOne: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;filter: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;student: studentId,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;course: courseId, date<br>
+&nbsp;&nbsp;&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;&nbsp;&nbsp;update: { $set: { status } },<br>
+&nbsp;&nbsp;&nbsp;&nbsp;upsert: <span class="kw">true</span><br>
+&nbsp;&nbsp;}<br>
+}));<br>
+<span class="kw">await</span> Attendance.<span class="fn">bulkWrite</span>(ops);
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 10 — PDF & EMAIL ═══ -->
+  <div class="slide" id="s10">
+    <div class="slide-header">
+      <span class="slide-tag">Features</span>
+      <span class="slide-num">10 / 14</span>
+    </div>
+    <div class="slide-body">
+      <h2 style="margin-bottom:20px;">PDF Generation &amp; <span class="accent">Email Alerts</span></h2>
+      <div class="grid2">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="card card-accent">
+            <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">📄 PDFKit — 3 PDF Types</div>
+            <ul class="feat" style="margin-bottom:12px;">
+              <li>Report Card — per academic year with grade table</li>
+              <li>Fee Receipt — term-wise breakdown + status</li>
+              <li>Timetable — landscape 5-day grid</li>
+            </ul>
+            <div class="code-block" style="font-size:10.5px;">
+<span class="kw">const</span> doc = <span class="kw">new</span> <span class="fn">PDFDocument</span>({ size: <span class="str">'A4'</span> });<br>
+res.<span class="fn">setHeader</span>(<span class="str">'Content-Type'</span>, <span class="str">'application/pdf'</span>);<br>
+doc.<span class="fn">pipe</span>(res);<br><br>
+<span class="cmt">// Draw branded header</span><br>
+doc.<span class="fn">rect</span>(<span class="num">0</span>,<span class="num">0</span>, width, <span class="num">60</span>).<span class="fn">fill</span>(<span class="str">'#000'</span>);<br>
+doc.<span class="fn">fillColor</span>(<span class="str">'#DF740C'</span>).<span class="fn">text</span>(<span class="str">'ERP'</span>, <span class="num">40</span>, <span class="num">18</span>);<br>
+<span class="cmt">// ... render grade table rows ...</span><br>
+doc.<span class="fn">end</span>();
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="card">
+            <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">📧 Nodemailer — 3 Alert Types</div>
+            <ul class="feat" style="margin-bottom:12px;">
+              <li>Fee confirmation → parent when fee fully paid</li>
+              <li>Attendance alert → parent when below 75%</li>
+              <li>Leave update → parent when approved/rejected</li>
+            </ul>
+            <div class="code-block" style="font-size:10.5px;">
+<span class="kw">const</span> transporter = nodemailer.<span class="fn">createTransport</span>({<br>
+&nbsp;&nbsp;host: process.env.<span class="obj">SMTP_HOST</span>,<br>
+&nbsp;&nbsp;auth: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user: process.env.<span class="obj">SMTP_USER</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;pass: process.env.<span class="obj">SMTP_PASS</span><br>
+&nbsp;&nbsp;}<br>
+});<br><br>
+<span class="cmt">// Triggered after fee payment recorded</span><br>
+<span class="kw">if</span> (fee.status === <span class="str">'paid'</span>)<br>
+&nbsp;&nbsp;<span class="kw">await</span> mailer.<span class="fn">sendFeeReceipt</span>(parentEmail, data);
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 11 — ROLES ═══ -->
+  <div class="slide" id="s11">
+    <div class="slide-header">
+      <span class="slide-tag">User Roles</span>
+      <span class="slide-num">11 / 14</span>
+    </div>
+    <div class="slide-body">
+      <h2 style="margin-bottom:20px;">Three <span class="accent">Role Types</span></h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;height:calc(100% - 60px);">
+        <div class="card" style="border-color:rgba(34,197,94,0.4);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(34,197,94,0.12);display:flex;align-items:center;justify-content:center;font-size:18px;">🎒</div>
+            <div>
+              <div style="font-weight:800;font-size:16px;">Student</div>
+              <div style="font-size:11px;color:#22C55E;font-weight:600;">Read-only own data</div>
+            </div>
+          </div>
+          <ul class="feat">
+            <li>View dashboard with live stats</li>
+            <li>Check attendance percentage</li>
+            <li>View report card & download PDF</li>
+            <li>See class timetable & syllabus</li>
+            <li>Track fee payments</li>
+            <li>Apply for leave</li>
+            <li>View library issued books</li>
+            <li>Read school notices</li>
+          </ul>
+        </div>
+        <div class="card" style="border-color:rgba(223,116,12,0.4);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:var(--orange-dim);display:flex;align-items:center;justify-content:center;font-size:18px;">👩‍🏫</div>
+            <div>
+              <div style="font-weight:800;font-size:16px;">Teacher</div>
+              <div style="font-size:11px;color:var(--orange);font-weight:600;">Class management</div>
+            </div>
+          </div>
+          <ul class="feat">
+            <li>Mark daily attendance for subjects</li>
+            <li>Enter term-wise grades for students</li>
+            <li>Post school notices & announcements</li>
+            <li>Review & approve leave applications</li>
+            <li>View class-wise student lists</li>
+            <li>Delete/manage own announcements</li>
+          </ul>
+        </div>
+        <div class="card" style="border-color:rgba(59,130,246,0.4);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(59,130,246,0.12);display:flex;align-items:center;justify-content:center;font-size:18px;">🔑</div>
+            <div>
+              <div style="font-weight:800;font-size:16px;">Admin</div>
+              <div style="font-size:11px;color:#60A5FA;font-weight:600;">Full access</div>
+            </div>
+          </div>
+          <ul class="feat">
+            <li>Create/manage all user accounts</li>
+            <li>Define subjects & timetables</li>
+            <li>Record fee payments & generate receipts</li>
+            <li>Issue & return library books</li>
+            <li>Seed initial database</li>
+            <li>All teacher permissions +</li>
+            <li>Update student profiles</li>
+            <li>Full CRUD on all resources</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 12 — IMPLEMENTATION CHALLENGES ═══ -->
+  <div class="slide" id="s12">
+    <div class="slide-header">
+      <span class="slide-tag">Implementation</span>
+      <span class="slide-num">12 / 14</span>
+    </div>
+    <div class="slide-body">
+      <h2 style="margin-bottom:20px;">Challenges &amp; <span class="accent">Solutions</span></h2>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card" style="display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;gap:16px;">
+          <div><div style="font-size:11px;font-weight:700;color:#EF4444;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">⚠ Challenge</div><p style="font-size:13px;color:#C0C0C0;">Mongoose <code style="color:var(--orange)">findOneAndUpdate</code> bypasses the <code style="color:var(--orange)">pre('save')</code> hook — seed script stored plain-text passwords, breaking login.</p></div>
+          <div style="text-align:center;color:var(--orange);font-size:20px;">→</div>
+          <div><div style="font-size:11px;font-weight:700;color:#22C55E;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">✓ Solution</div><p style="font-size:13px;color:#C0C0C0;">Changed seed to use <code style="color:var(--orange)">new User({...}).save()</code> which triggers the bcrypt hashing hook correctly.</p></div>
+        </div>
+        <div class="card" style="display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;gap:16px;">
+          <div><div style="font-size:11px;font-weight:700;color:#EF4444;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">⚠ Challenge</div><p style="font-size:13px;color:#C0C0C0;">Mongoose <code style="color:var(--orange)">populate()</code> for course data was failing silently — timetable, attendance, and syllabus pages all returned empty data.</p></div>
+          <div style="text-align:center;color:var(--orange);font-size:20px;">→</div>
+          <div><div style="font-size:11px;font-weight:700;color:#22C55E;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">✓ Solution</div><p style="font-size:13px;color:#C0C0C0;">The <code style="color:var(--orange)">Course</code> model was never <code style="color:var(--orange)">require()</code>'d anywhere. Added all model imports to <code style="color:var(--orange)">index.js</code> before routes load.</p></div>
+        </div>
+        <div class="card" style="display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;gap:16px;">
+          <div><div style="font-size:11px;font-weight:700;color:#EF4444;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">⚠ Challenge</div><p style="font-size:13px;color:#C0C0C0;">Vite's dev proxy works for local development but is stripped in production builds — frontend API calls broke on deployment.</p></div>
+          <div style="text-align:center;color:var(--orange);font-size:20px;">→</div>
+          <div><div style="font-size:11px;font-weight:700;color:#22C55E;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">✓ Solution</div><p style="font-size:13px;color:#C0C0C0;">Used <code style="color:var(--orange)">import.meta.env.VITE_API_URL</code> as the base URL — falls back to <code style="color:var(--orange)">/api</code> in dev, uses Railway URL in production.</p></div>
+        </div>
+        <div class="card" style="display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;gap:16px;">
+          <div><div style="font-size:11px;font-weight:700;color:#EF4444;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">⚠ Challenge</div><p style="font-size:13px;color:#C0C0C0;">macOS AirPlay Receiver permanently occupies port 5000, causing the Express server to crash on startup.</p></div>
+          <div style="text-align:center;color:var(--orange);font-size:20px;">→</div>
+          <div><div style="font-size:11px;font-weight:700;color:#22C55E;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">✓ Solution</div><p style="font-size:13px;color:#C0C0C0;">Switched backend to port 8000 via <code style="color:var(--orange)">.env</code>, updated Vite proxy target accordingly.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 13 — FUTURE SCOPE ═══ -->
+  <div class="slide" id="s13">
+    <div class="slide-header">
+      <span class="slide-tag">Future Scope</span>
+      <span class="slide-num">13 / 14</span>
+    </div>
+    <div class="slide-body">
+      <h2 style="margin-bottom:20px;">What's <span class="accent">Next</span></h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+        <div class="card">
+          <div style="font-size:22px;margin-bottom:10px;">📱</div>
+          <h3 style="color:var(--orange);margin-bottom:8px;">Mobile App</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.7;">React Native app for parents to get real-time push notifications for attendance, grades, and school notices.</p>
+        </div>
+        <div class="card">
+          <div style="font-size:22px;margin-bottom:10px;">💳</div>
+          <h3 style="color:var(--orange);margin-bottom:8px;">Online Fee Payment</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.7;">Integrate Razorpay or Stripe so parents can pay fees directly from the portal and auto-receive digital receipts.</p>
+        </div>
+        <div class="card">
+          <div style="font-size:22px;margin-bottom:10px;">📊</div>
+          <h3 style="color:var(--orange);margin-bottom:8px;">Analytics Dashboard</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.7;">Admin charts showing school-wide attendance trends, subject-wise performance, and fee collection rates.</p>
+        </div>
+        <div class="card">
+          <div style="font-size:22px;margin-bottom:10px;">💬</div>
+          <h3 style="color:var(--orange);margin-bottom:8px;">Parent Portal</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.7;">Dedicated login for parents to view their child's attendance, grades, fees, and communicate with the class teacher.</p>
+        </div>
+        <div class="card">
+          <div style="font-size:22px;margin-bottom:10px;">📝</div>
+          <h3 style="color:var(--orange);margin-bottom:8px;">Online Exam Portal</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.7;">MCQ and subjective tests taken online, auto-graded, results instantly pushed to the report card.</p>
+        </div>
+        <div class="card">
+          <div style="font-size:22px;margin-bottom:10px;">🔔</div>
+          <h3 style="color:var(--orange);margin-bottom:8px;">SMS Alerts</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.7;">Twilio integration to send SMS to parents who may not have email — for attendance alerts and exam results.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 14 — CONCLUSION ═══ -->
+  <div class="slide" id="s14">
+    <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100%;text-align:center;padding:0 10vw;background:radial-gradient(ellipse 60% 60% at 50% 50%, rgba(223,116,12,0.07) 0%, transparent 70%);">
+      <div style="width:70px;height:70px;background:var(--orange);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:#000;font-style:italic;margin-bottom:24px;">E</div>
+      <h1 style="font-size:clamp(32px,5vw,60px);margin-bottom:16px;">Thank <span class="accent">You</span></h1>
+      <p style="font-size:16px;color:var(--muted);max-width:560px;line-height:1.8;margin-bottom:36px;">A full-stack School ERP built on the MERN stack — managing attendance, grades, fees, timetables, leave, library, and automated PDF + email workflows.</p>
+      <div style="display:flex;gap:32px;justify-content:center;margin-bottom:36px;">
+        <div style="text-align:center;"><div class="stat-big">10</div><div class="stat-lbl">DB Models</div></div>
+        <div style="text-align:center;"><div class="stat-big">8</div><div class="stat-lbl">API Routes</div></div>
+        <div style="text-align:center;"><div class="stat-big">13</div><div class="stat-lbl">Pages</div></div>
+        <div style="text-align:center;"><div class="stat-big">3</div><div class="stat-lbl">Roles</div></div>
+        <div style="text-align:center;"><div class="stat-big">3</div><div class="stat-lbl">PDF Types</div></div>
+      </div>
+      <div style="font-size:14px;color:var(--muted);">Questions? We're happy to walk through any part of the code.</div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- NAV -->
+<div class="nav">
+  <button onclick="go(-1)">&#8592;</button>
+  <div class="dots" id="dots"></div>
+  <span class="counter" id="counter">1 / 14</span>
+  <button onclick="go(1)">&#8594;</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total  = slides.length;
+  let cur = 0;
+
+  // Build dots
+  const dotsEl = document.getElementById('dots');
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  });
+
+  // Inline the page list for slide 6
+  const pageList = document.querySelector('#s6 .card:nth-child(2)');
+  if (pageList) {
+    const pages = ['Dashboard','Profile','Attendance','Report Card','Timetable','Syllabus','Fees','Leave','Library','Hostel','Class Teacher','Announcements','School Blog'];
+    const grid = pageList.querySelector('div[style*="grid"]');
+    if (grid) {
+      grid.innerHTML = pages.map(p =>
+        `<div style="background:#0A0A0A;border:1px solid #2C2C2C;border-radius:6px;padding:6px 10px;font-size:11px;color:#A0A0A0;">${p}</div>`
+      ).join('');
+    }
+  }
+
+  // Inline the schema boxes for slide 9
+  const schemaRow = document.querySelector('#s9 div[style*="grid-template-columns: repeat(5"]');
+  if (schemaRow) {
+    const models = ['User','Student','Course','Timetable','Attendance','Fee','Grade','Announcement','Leave','Library'];
+    schemaRow.innerHTML = models.map(m =>
+      `<div class="arch-box"><span style="color:var(--orange);font-weight:700;">${m}</span></div>`
+    ).join('');
+  }
+
+  // Inline routes for slide 8
+  const routeList = document.querySelector('#s8 .card div[style*="flex-direction:column"]');
+  if (routeList) {
+    const routes = [
+      ['/api/auth','POST login, register, GET me'],
+      ['/api/students','CRUD student profiles'],
+      ['/api/timetable','GET class timetable'],
+      ['/api/attendance','Mark + view attendance'],
+      ['/api/grades','Enter + view grades'],
+      ['/api/fees','Fee records + payments'],
+      ['/api/leave','Apply + review leave'],
+      ['/api/pdf','Report card, receipt, timetable'],
+    ];
+    routeList.innerHTML = routes.map(([r,d]) =>
+      `<div style="display:flex;gap:10px;align-items:baseline;"><code style="color:var(--orange);font-size:11px;flex-shrink:0;">${r}</code><span style="color:#666;">— ${d}</span></div>`
+    ).join('');
+  }
+
+  function goTo(n) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = Math.max(0, Math.min(total - 1, n));
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    document.getElementById('counter').textContent = `${cur + 1} / ${total}`;
+    document.getElementById('progress').style.width = `${((cur + 1) / total) * 100}%`;
+  }
+
+  function go(dir) { goTo(cur + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') go(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                     go(-1);
+  });
+
+  // Init progress
+  document.getElementById('progress').style.width = `${(1 / total) * 100}%`;
+</script>
+</body>
+</html>

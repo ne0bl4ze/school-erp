@@ -13,6 +13,13 @@ const studentSchema = new mongoose.Schema({
   address:       { type: String },
   hostelRoom:    { type: String },
   classTeacher:  { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  parent:        { type: mongoose.Schema.Types.ObjectId, ref: 'Parent' },
+  promotionHistory: [{
+    fromGrade:    Number,
+    toGrade:      Number,
+    academicYear: String,
+    promotedAt:   Date,
+  }],
 }, { timestamps: true });
 
 module.exports = mongoose.model('Student', studentSchema);

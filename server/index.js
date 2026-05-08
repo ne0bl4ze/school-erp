@@ -1,11 +1,12 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
+const cors    = require('cors');
 const connectDB = require('./config/db');
 
-// Register all Mongoose models before any route uses them for populate
+// Register all Mongoose models before routes
 require('./models/User');
 require('./models/Student');
+require('./models/Parent');
 require('./models/Course');
 require('./models/Timetable');
 require('./models/Attendance');
@@ -14,9 +15,12 @@ require('./models/Grade');
 require('./models/Announcement');
 require('./models/Leave');
 require('./models/Library');
+require('./models/Admission');
+require('./models/Message');
+require('./models/AcademicYear');
+require('./models/Promotion');
 
 const app = express();
-
 connectDB();
 
 app.use(cors({
@@ -25,16 +29,22 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.use('/api/auth',          require('./routes/auth'));
-app.use('/api/students',      require('./routes/students'));
-app.use('/api/timetable',     require('./routes/timetable'));
-app.use('/api/attendance',    require('./routes/attendance'));
-app.use('/api/fees',          require('./routes/fees'));
-app.use('/api/grades',        require('./routes/grades'));
-app.use('/api/announcements', require('./routes/announcements'));
-app.use('/api/leave',         require('./routes/leave'));
-app.use('/api/library',       require('./routes/library'));
-app.use('/api/pdf',           require('./routes/pdf'));
+app.use('/api/auth',           require('./routes/auth'));
+app.use('/api/students',       require('./routes/students'));
+app.use('/api/timetable',      require('./routes/timetable'));
+app.use('/api/attendance',     require('./routes/attendance'));
+app.use('/api/fees',           require('./routes/fees'));
+app.use('/api/grades',         require('./routes/grades'));
+app.use('/api/announcements',  require('./routes/announcements'));
+app.use('/api/leave',          require('./routes/leave'));
+app.use('/api/library',        require('./routes/library'));
+app.use('/api/pdf',            require('./routes/pdf'));
+app.use('/api/admissions',     require('./routes/admissions'));
+app.use('/api/parents',        require('./routes/parents'));
+app.use('/api/messages',       require('./routes/messages'));
+app.use('/api/academic-years', require('./routes/academicYears'));
+app.use('/api/promotions',     require('./routes/promotions'));
+app.use('/api/dashboard',      require('./routes/dashboard'));
 
 app.get('/api/health', (_, res) => res.json({ status: 'ok' }));
 

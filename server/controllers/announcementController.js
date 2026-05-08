@@ -2,7 +2,8 @@ const Announcement = require('../models/Announcement');
 
 exports.getAll = async (req, res) => {
   try {
-    const filter = { $or: [{ targetRole: 'all' }, { targetRole: req.user.role }] };
+    const role = req.user.role === 'admin' ? 'principal' : req.user.role;
+    const filter = { $or: [{ targetRole: 'all' }, { targetRole: role }] };
     const list = await Announcement.find(filter)
       .populate('author', 'name role')
       .sort({ pinned: -1, createdAt: -1 });

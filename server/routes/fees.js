@@ -4,7 +4,7 @@ const { allow }   = require('../middleware/rbac');
 const ctrl = require('../controllers/feeController');
 
 router.get('/my',             protect, allow('student'),       ctrl.getMyFees);
-router.post('/',              protect, allow('admin'),          ctrl.createFee);
-router.post('/:id/pay',       protect, allow('admin'),          ctrl.recordPayment);
+router.post('/',              protect, allow('admin','principal'),          ctrl.createFee);
+router.post('/:id/pay',       protect, allow('admin','principal'),          ctrl.recordPayment);
 
 module.exports = router;

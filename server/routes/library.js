@@ -20,7 +20,7 @@ router.get('/my', protect, allow('student'), async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-router.post('/issue', protect, allow('admin'), async (req, res) => {
+router.post('/issue', protect, allow('admin','principal'), async (req, res) => {
   try {
     const { studentId, bookId } = req.body;
     const book = await Book.findById(bookId);
@@ -33,7 +33,7 @@ router.post('/issue', protect, allow('admin'), async (req, res) => {
   } catch (err) { res.status(400).json({ message: err.message }); }
 });
 
-router.put('/return/:id', protect, allow('admin'), async (req, res) => {
+router.put('/return/:id', protect, allow('admin','principal'), async (req, res) => {
   try {
     const issue = await Issue.findById(req.params.id).populate('book');
     if (!issue) return res.status(404).json({ message: 'Not found' });

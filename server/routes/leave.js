@@ -21,7 +21,7 @@ router.post('/', protect, allow('student'), async (req, res) => {
   } catch (err) { res.status(400).json({ message: err.message }); }
 });
 
-router.get('/all', protect, allow('teacher','admin'), async (req, res) => {
+router.get('/all', protect, allow('teacher','admin','principal'), async (req, res) => {
   try {
     const leaves = await Leave.find()
       .populate({ path: 'student', populate: { path: 'user', select: 'name' } })
@@ -30,7 +30,7 @@ router.get('/all', protect, allow('teacher','admin'), async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-router.put('/:id/review', protect, allow('teacher','admin'), async (req, res) => {
+router.put('/:id/review', protect, allow('teacher','admin','principal'), async (req, res) => {
   try {
     const { status, remarks } = req.body;
     const leave = await Leave.findByIdAndUpdate(

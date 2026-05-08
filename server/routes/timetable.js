@@ -28,7 +28,7 @@ router.get('/:id', protect, async (req, res) => {
   }
 });
 
-router.post('/', protect, allow('admin'), async (req, res) => {
+router.post('/', protect, allow('admin','principal'), async (req, res) => {
   try {
     const tt = await Timetable.create(req.body);
     res.status(201).json(tt);

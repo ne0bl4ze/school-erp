@@ -3,7 +3,7 @@ const { protect } = require('../middleware/auth');
 const { allow }   = require('../middleware/rbac');
 const Student = require('../models/Student');
 
-router.get('/', protect, allow('teacher','admin'), async (req, res) => {
+router.get('/', protect, allow('teacher','admin','principal'), async (req, res) => {
   try {
     const { grade, section } = req.query;
     const filter = {};
@@ -28,7 +28,7 @@ router.get('/:id', protect, async (req, res) => {
   }
 });
 
-router.put('/:id', protect, allow('admin'), async (req, res) => {
+router.put('/:id', protect, allow('admin','principal'), async (req, res) => {
   try {
     const student = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     res.json(student);

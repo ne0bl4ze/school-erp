@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "scripts": {
     "install:all": "cd server && npm install && cd ../client && npm install",
-    "dev":         "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\"",
-    "seed":        "cd server && npm run seed"
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\"",
+    "seed": "cd server && npm run seed"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
   }
 }
