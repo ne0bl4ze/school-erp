@@ -45,7 +45,7 @@ export default function ChildFees() {
           <div className="card">
             <div className="card-header"><span className="card-title">Term-wise Fees</span></div>
             <table>
-              <thead><tr><th>Term</th><th>Tuition</th><th>Hostel</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th></tr></thead>
+              <thead><tr><th>Term</th><th>Tuition</th><th>Hostel</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th>Receipt</th></tr></thead>
               <tbody>
                 {fees.map(f => (
                   <tr key={f._id}>
@@ -56,6 +56,12 @@ export default function ChildFees() {
                     <td style={{ color:'#22C55E' }}>₹{f.paidAmount?.toLocaleString()}</td>
                     <td style={{ color:(f.totalAmount-f.paidAmount)>0?'#EF4444':'#22C55E' }}>₹{(f.totalAmount-f.paidAmount).toLocaleString()}</td>
                     <td><span className={`badge badge-${f.status==='paid'?'green':f.status==='partial'?'orange':'red'}`}>{f.status}</span></td>
+                    <td>
+                      <button className="btn btn-ghost btn-sm" onClick={() => window.open(`/print/fee-receipt/${f.semester}?childId=${child._id}`, '_blank')}>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                        Print
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

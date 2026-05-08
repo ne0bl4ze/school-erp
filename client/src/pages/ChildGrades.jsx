@@ -48,7 +48,15 @@ export default function ChildGrades() {
           )}
           {years.map(year => (
             <div key={year} className="card" style={{ marginBottom:18 }}>
-              <div className="card-header"><span className="card-title">Academic Year {year}</span></div>
+              <div className="card-header">
+                <span className="card-title">Academic Year {year}</span>
+                <div className="card-actions">
+                  <button className="btn btn-ghost btn-sm" onClick={() => window.open(`/print/report-card/${encodeURIComponent(year)}?childId=${child._id}`, '_blank')}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                    Print Report Card
+                  </button>
+                </div>
+              </div>
               <table>
                 <thead><tr><th>Subject</th><th>Term 1</th><th>Term 2</th><th>Final</th><th>Practical</th><th>Avg %</th><th>Grade</th></tr></thead>
                 <tbody>

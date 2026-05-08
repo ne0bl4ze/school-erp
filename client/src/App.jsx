@@ -31,6 +31,9 @@ import ChildGrades   from './pages/ChildGrades';
 import ChildFees     from './pages/ChildFees';
 import ChildTimetable from './pages/ChildTimetable';
 import ParentMessages from './pages/ParentMessages';
+// Print pages (no layout/sidebar)
+import PrintReportCard from './pages/print/ReportCard';
+import PrintFeeReceipt from './pages/print/FeeReceipt';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -60,6 +63,11 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+
+          {/* Printable standalone pages — no sidebar/header */}
+          <Route path="/print/report-card/:year" element={<PrivateRoute><PrintReportCard /></PrivateRoute>} />
+          <Route path="/print/fee-receipt/:term"  element={<PrivateRoute><PrintFeeReceipt /></PrivateRoute>} />
+
           <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
             <Route index              element={<Dashboard />} />
             <Route path="profile"    element={<Profile />} />

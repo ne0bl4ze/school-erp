@@ -9,6 +9,7 @@ export default function Fees() {
     api.get('/fees/my').then(r => setFees(r.data)).finally(() => setLoading(false));
   }, []);
 
+  const printReceipt    = (sem) => window.open(`/print/fee-receipt/${sem}`, '_blank');
   const downloadReceipt = (sem) => window.open(`/api/pdf/fee-receipt/${sem}`, '_blank');
 
   const total   = fees.reduce((a, f) => a + f.totalAmount, 0);
@@ -63,10 +64,16 @@ export default function Fees() {
                   </span>
                 </td>
                 <td>
-                  <button className="btn btn-ghost btn-sm" onClick={() => downloadReceipt(f.semester)}>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    PDF
-                  </button>
+                  <div style={{ display:'flex', gap:4 }}>
+                    <button className="btn btn-ghost btn-sm" onClick={() => printReceipt(f.semester)}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                      Print
+                    </button>
+                    <button className="btn btn-ghost btn-sm" onClick={() => downloadReceipt(f.semester)}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                      PDF
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

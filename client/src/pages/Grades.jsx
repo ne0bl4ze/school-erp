@@ -20,6 +20,7 @@ export default function Grades() {
     }
   }, [user.role]);
 
+  const printReportCard = (year) => window.open(`/print/report-card/${encodeURIComponent(year)}`, '_blank');
   const downloadReportCard = (year) => window.open(`/api/pdf/report-card/${encodeURIComponent(year)}`, '_blank');
   // academicYear used as key throughout
 
@@ -50,10 +51,14 @@ export default function Grades() {
           <div className="card-header">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             <span className="card-title">Academic Year {year}</span>
-            <div className="card-actions">
+            <div className="card-actions" style={{ display:'flex', gap:8 }}>
+              <button className="btn btn-ghost btn-sm" onClick={() => printReportCard(year)}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                Print
+              </button>
               <button className="btn btn-ghost btn-sm" onClick={() => downloadReportCard(year)}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Download Report Card
+                PDF
               </button>
             </div>
           </div>
