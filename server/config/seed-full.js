@@ -188,32 +188,50 @@ async function seed() {
   }
   console.log('Courses seeded for grades 6–12');
 
-  // ── TIMETABLE (grade 8 section A — base) ─────────────────
-  const g8courses = allCourses['8'];
-  await Timetable.findOneAndUpdate(
-    { grade:8, section:'A', academicYear:'2025-26' },
-    {
-      grade:8, section:'A', academicYear:'2025-26', isActive:true,
-      slots:[
-        { day:'Monday',    startTime:'08:00', endTime:'08:45', course:g8courses[0]._id, room:'Room 8A', type:'lecture' },
-        { day:'Monday',    startTime:'08:45', endTime:'09:30', course:g8courses[1]._id, room:'Room 8A', type:'lecture' },
-        { day:'Monday',    startTime:'09:45', endTime:'10:30', course:g8courses[2]._id, room:'Lab 1',   type:'lab'     },
-        { day:'Tuesday',   startTime:'08:00', endTime:'08:45', course:g8courses[3]._id, room:'Room 8A', type:'lecture' },
-        { day:'Tuesday',   startTime:'08:45', endTime:'09:30', course:g8courses[4]._id, room:'Lab 2',   type:'lab'     },
-        { day:'Tuesday',   startTime:'09:45', endTime:'10:30', course:g8courses[5]._id, room:'Room 8A', type:'lecture' },
-        { day:'Wednesday', startTime:'08:00', endTime:'08:45', course:g8courses[1]._id, room:'Room 8A', type:'lecture' },
-        { day:'Wednesday', startTime:'08:45', endTime:'09:30', course:g8courses[2]._id, room:'Room 8A', type:'lecture' },
-        { day:'Wednesday', startTime:'09:45', endTime:'10:30', course:g8courses[0]._id, room:'Room 8A', type:'lecture' },
-        { day:'Thursday',  startTime:'08:00', endTime:'08:45', course:g8courses[4]._id, room:'Lab 2',   type:'lab'     },
-        { day:'Thursday',  startTime:'08:45', endTime:'09:30', course:g8courses[3]._id, room:'Room 8A', type:'lecture' },
-        { day:'Thursday',  startTime:'09:45', endTime:'10:30', course:g8courses[5]._id, room:'Room 8A', type:'lecture' },
-        { day:'Friday',    startTime:'08:00', endTime:'08:45', course:g8courses[2]._id, room:'Room 8A', type:'lecture' },
-        { day:'Friday',    startTime:'08:45', endTime:'09:30', course:g8courses[1]._id, room:'Room 8A', type:'lecture' },
-        { day:'Friday',    startTime:'09:45', endTime:'10:30', course:g8courses[0]._id, room:'Room 8A', type:'lecture' },
-      ],
-    },
-    { upsert:true, new:true }
-  );
+  // ── TIMETABLES — one per grade 6-12, sections A & B ─────
+  const SLOT_TEMPLATES = [
+    { day:'Monday',    startTime:'08:00', endTime:'08:45', roomSuffix:'A', type:'lecture', ci:0 },
+    { day:'Monday',    startTime:'08:45', endTime:'09:30', roomSuffix:'A', type:'lecture', ci:1 },
+    { day:'Monday',    startTime:'09:45', endTime:'10:30', roomSuffix:'',  type:'lab',     ci:2, lab:true },
+    { day:'Monday',    startTime:'10:45', endTime:'11:30', roomSuffix:'A', type:'lecture', ci:3 },
+    { day:'Tuesday',   startTime:'08:00', endTime:'08:45', roomSuffix:'A', type:'lecture', ci:4 },
+    { day:'Tuesday',   startTime:'08:45', endTime:'09:30', roomSuffix:'',  type:'lab',     ci:5, lab:true },
+    { day:'Tuesday',   startTime:'09:45', endTime:'10:30', roomSuffix:'A', type:'lecture', ci:0 },
+    { day:'Tuesday',   startTime:'10:45', endTime:'11:30', roomSuffix:'A', type:'lecture', ci:1 },
+    { day:'Wednesday', startTime:'08:00', endTime:'08:45', roomSuffix:'A', type:'lecture', ci:2 },
+    { day:'Wednesday', startTime:'08:45', endTime:'09:30', roomSuffix:'A', type:'lecture', ci:3 },
+    { day:'Wednesday', startTime:'09:45', endTime:'10:30', roomSuffix:'A', type:'lecture', ci:4 },
+    { day:'Wednesday', startTime:'10:45', endTime:'11:30', roomSuffix:'',  type:'lab',     ci:5, lab:true },
+    { day:'Thursday',  startTime:'08:00', endTime:'08:45', roomSuffix:'A', type:'lecture', ci:1 },
+    { day:'Thursday',  startTime:'08:45', endTime:'09:30', roomSuffix:'A', type:'lecture', ci:0 },
+    { day:'Thursday',  startTime:'09:45', endTime:'10:30', roomSuffix:'',  type:'lab',     ci:2, lab:true },
+    { day:'Thursday',  startTime:'10:45', endTime:'11:30', roomSuffix:'A', type:'lecture', ci:3 },
+    { day:'Friday',    startTime:'08:00', endTime:'08:45', roomSuffix:'A', type:'lecture', ci:4 },
+    { day:'Friday',    startTime:'08:45', endTime:'09:30', roomSuffix:'A', type:'lecture', ci:5 },
+    { day:'Friday',    startTime:'09:45', endTime:'10:30', roomSuffix:'A', type:'lecture', ci:0 },
+    { day:'Friday',    startTime:'10:45', endTime:'11:30', roomSuffix:'A', type:'lecture', ci:1 },
+  ];
+
+  for (const grade of [6,7,8,9,10,11,12]) {
+    const cs = allCourses[String(grade)] || [];
+    if (!cs.length) continue;
+    for (const section of ['A','B']) {
+      const roomBase = `Room ${grade}${section}`;
+      const slots = SLOT_TEMPLATES.map(t => ({
+        day:       t.day,
+        startTime: t.startTime,
+        endTime:   t.endTime,
+        course:    cs[t.ci % cs.length]._id,
+        room:      t.lab ? `Lab ${grade % 3 + 1}` : roomBase,
+        type:      t.type,
+      }));
+      await Timetable.findOneAndUpdate(
+        { grade, section, academicYear:'2025-26' },
+        { grade, section, academicYear:'2025-26', isActive:true, slots },
+        { upsert:true, new:true }
+      );
+    }
+  }
 
   // ── 50 STUDENTS ───────────────────────────────────────────
   const schoolDays = getSchoolDays(30);

@@ -76,9 +76,20 @@ exports.childTimetable = async (req, res) => {
   try {
     await getParentAndValidate(req.user._id, req.params.id);
     const student = await Student.findById(req.params.id);
-    const tt = await Timetable.findOne({
+    // Try exact match first; fall back to any active timetable for the grade+section
+    let tt = await Timetable.findOne({
       grade: student.grade, section: student.section, academicYear: student.academicYear, isActive: true,
     }).populate('slots.course', 'name code syllabus');
+    if (!tt) {
+      tt = await Timetable.findOne({
+        grade: student.grade, section: student.section, isActive: true,
+      }).populate('slots.course', 'name code syllabus');
+    }
+    if (!tt) {
+      tt = await Timetable.findOne({
+        grade: student.grade, isActive: true,
+      }).populate('slots.course', 'name code syllabus');
+    }
     res.json(tt);
   } catch (err) { res.status(err.status || 500).json({ message: err.message }); }
 };

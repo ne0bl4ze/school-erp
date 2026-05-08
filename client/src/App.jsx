@@ -34,6 +34,7 @@ import ParentMessages from './pages/ParentMessages';
 // Print pages (no layout/sidebar)
 import PrintReportCard from './pages/print/ReportCard';
 import PrintFeeReceipt from './pages/print/FeeReceipt';
+import PrintTimetable  from './pages/print/Timetable';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -67,6 +68,7 @@ export default function App() {
           {/* Printable standalone pages — no sidebar/header */}
           <Route path="/print/report-card/:year" element={<PrivateRoute><PrintReportCard /></PrivateRoute>} />
           <Route path="/print/fee-receipt/:term"  element={<PrivateRoute><PrintFeeReceipt /></PrivateRoute>} />
+          <Route path="/print/timetable"          element={<PrivateRoute><PrintTimetable /></PrivateRoute>} />
 
           <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
             <Route index              element={<Dashboard />} />
