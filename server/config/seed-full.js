@@ -143,16 +143,16 @@ async function seed() {
   console.log('Connected. Running full seed…\n');
 
   // ── WIPE EXISTING DATA ────────────────────────────────────
-  const DEMO_EMAILS = ['principal@erp.edu','teacher@erp.edu','student@erp.edu','student2@erp.edu','parent@erp.edu'];
-  await User.deleteMany({ email: { $in: DEMO_EMAILS } });
-  await User.deleteMany({ email: /\.(stu|par)\d+@school\.edu/ });
-  await User.deleteMany({ email: /bulk\d+@erp\.edu/ });
+  // Delete all non-admin users created by any seed run
+  await User.deleteMany({ role: { $in: ['student', 'parent', 'teacher', 'principal'] } });
   await Student.deleteMany({});
   await Parent.deleteMany({});
   await Grade.deleteMany({});
   await Fee.deleteMany({});
   await Attendance.deleteMany({});
   await Leave.deleteMany({});
+  await Course.deleteMany({});
+  await Timetable.deleteMany({});
   console.log('Cleared old data');
 
   // ── PRINCIPAL ─────────────────────────────────────────────
