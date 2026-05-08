@@ -6,7 +6,9 @@ const connectDB = async () => {
     console.log(`MongoDB connected: ${conn.connection.host}`);
   } catch (err) {
     console.error('MongoDB connection error:', err.message);
-    process.exit(1);
+    // Retry after 5s instead of killing the process —
+    // keeps the HTTP server alive so Railway healthcheck passes
+    setTimeout(connectDB, 5000);
   }
 };
 
